@@ -227,3 +227,157 @@ class RedTeamResult(BaseModel):
 
     receipt_id: Optional[str] = None
     notes: str = ""
+    
+# -------------------------------------
+# Lobster Trap metadata schema
+# -------------------------------------
+
+class LobsterTrapFinding(BaseModel):
+    """
+    Normalized Lobster Trap result.
+    Internally, AxiomGuard uses risk_score on a 0-100 scale.
+    If an external tool returns a 0-1 score, this schema normalizes it.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    prompt_injection: bool = False
+    exfiltration_detected: bool = False
+    pii_detected: bool = False
+    credential_detected: bool = False
+    risky_command_detected: bool = False
+    intent_mismatch: bool = False
+
+    detected_domains: list[str] = Field(default_factory=list)
+    target_paths: list[str] = Field(default_factory=list)
+
+    declared_intent_category: str = "unknown"
+    detected_intent_category: str = "unknown"
+
+    risk_score: float = Field(default=0.0, ge=0.0, le=100.0)
+
+    raw: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("risk_score", mode="before")
+    @classmethod
+    def normalize_risk_score(cls, value: Any) -> float:
+        score = float(value)
+
+        # Lobster Trap or other scanners may output 0.0-1.0.
+        # AxiomGuard normalizes to 0-100 for dashboard readability.
+        if 0.0 < score <= 1.0:
+            return round(score * 100.0, 2)
+
+        return score
+
+    @property
+    def should_quarantine_from_trap(self) -> bool:
+        return self.prompt_injection or self.exfiltration_detected or self.risk_score >= 90.0
+
+# -----------------------------
+# LNN / verifier schemas
+# -----------------------------
+
+class TruthBound(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    lower: float = Field(default=0.0, ge=0.0, le=1.0)
+    upper: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    @model_validator(mode="after")
+    def validate_bounds(self) -> "TruthBound":
+        if self.lower > self.upper:
+            raise ValueError("TruthBound.lower cannot be greater than TruthBound.upper.")
+        return self
+
+    @classmethod
+    def point(cls, value: float) -> "TruthBound":
+        return cls(lower=value, upper=value)
+
+class MatchedFormula(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    policy_id: str
+    decision: Decision
+    formula: str
+    score: float = Field(..., ge=0.0, le=1.0)
+    trace: str
+
+class AxiomLNNInference(BaseModel):
+    """
+    Output of the AxiomLNN verifier.
+    The deterministic gate will convert these truth bounds into a final decision.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    allow: TruthBound = Field(default_factory=TruthBound)
+    deny: TruthBound = Field(default_factory=TruthBound)
+    redact: TruthBound = Field(default_factory=TruthBound)
+    quarantine: TruthBound = Field(default_factory=TruthBound)
+    human_review: TruthBound = Field(default_factory=TruthBound)
+    rate_limit: TruthBound = Field(default_factory=TruthBound)
+
+    contradiction_loss: float = Field(default=0.0, ge=0.0, le=1.0)
+    matched_formulas: list[MatchedFormula] = Field(default_factory=list)
+
+    facts: dict[str, bool | float | str] = Field(default_factory=dict)
+    trace: str = Field(default="")
+
+    def score_for(self, decision: Decision) -> float:
+        if decision == Decision.ALLOW:
+            return self.allow.lower
+        if decision == Decision.DENY:
+            return self.deny.lower
+        if decision == Decision.REDACT:
+            return self.redact.lower
+        if decision == Decision.QUARANTINE:
+            return self.quarantine.lower
+        if decision == Decision.HUMAN_REVIEW:
+            return self.human_review.lower
+        if decision == Decision.RATE_LIMIT:
+            return self.rate_limit.lower
+        return 0.0
+
+# -----------------------------------------
+# Enforcement and receipt schemas
+# -----------------------------------------
+
+class EnforcementDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    decision: Decision
+    reason: str
+    matched_policy: str = "none"
+    safe_alternative: Optional[str] = None
+    execution_status: ExecutionStatus = ExecutionStatus.NOT_EXECUTED
+
+    @property
+    def allowed_to_execute(self) -> bool:
+        return self.decision == Decision.ALLOW
+
+class DecisionReceipt(BaseModel):
+    """
+    Audit-ready record for the agent action.
+    This is the artifact shown to judges, CISOs, compliance teams, and regulators.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    receipt_id: str
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    agent: str = "procurement_copilot"
+    action: ActionScript
+    lobstertrap_findings: LobsterTrapFinding
+    lnn_inference: AxiomLNNInference
+    enforcement: EnforcementDecision
+
+    receipt_hash: Optional[str] = None
+    previous_receipt_hash: Optional[str] = None
+
+    version: str = "1.0"
+
+    @property
+    def final_decision(self) -> Decision:
+        return self.enforcement.decision
+    @property
+    def allowed_to_execute(self) -> bool:
+        return self.enforcement.allowed_to_execute
