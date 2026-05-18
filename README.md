@@ -59,16 +59,11 @@ Tamper-Evident: Decision Receipts are immutable. If a receipt is modified after 
 
 4. Receipt-Required Tool Execution
 AxiomGuard simulated enterprise tools refuse to run unless a valid ALLOW receipt is presented. Protected simulated tools include:
-
-docs.summarize
-
-erp.approve_invoice
-
-email.send
-
-workflow.create_approval_packet
-
-reports.create_redacted_report
+   + docs.summarize
+   + erp.approve_invoice
+   + email.send
+   + workflow.create_approval_packet
+   + reports.create_redacted_report
 
 5. Red-Team Replay Suite
 AxiomGuard includes repeatable red-team scenarios for:
