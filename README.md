@@ -72,35 +72,23 @@ reports.create_redacted_report
 
 5. Red-Team Replay Suite
 AxiomGuard includes repeatable red-team scenarios for:
-
-Prompt injection
-
-Exfiltration
-
-Employee PII export
-
-Credential leakage
-
-High-value invoice approval
-
-Declared-vs-detected intent mismatch
-
-Safe approval packet creation
-
-Safe redacted reporting
+   + Prompt injection
+   + Exfiltration
+   + Employee PII export
+   + Credential leakage
+   + High-value invoice approval
+   + Declared-vs-detected intent mismatch
+   + Safe approval packet creation
+   + Safe redacted reporting
 
 The suite compares baseline unsafe behavior with AxiomGuard-protected behavior.
 
 6. OWASP LLM Risk Mapping
 Red-team scenarios are mapped to OWASP LLM risk categories, including:
-
-LLM01:2025 Prompt Injection
-
-LLM02:2025 Sensitive Information Disclosure
-
-LLM05:2025 Improper Output Handling
-
-LLM06:2025 Excessive Agency
+   + LLM01:2025 Prompt Injection
+   + LLM02:2025 Sensitive Information Disclosure
+   + LLM05:2025 Improper Output Handling
+   + LLM06:2025 Excessive Agency
 
 7. Executive Evidence Dashboard
 The Streamlit dashboard provides:
