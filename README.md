@@ -60,7 +60,7 @@ Tamper-Evident: Decision Receipts are immutable. If a receipt is modified after 
 4. Receipt-Required Tool Execution
 AxiomGuard simulated enterprise tools refuse to run unless a valid ALLOW receipt is presented. Protected simulated tools include:
    + docs.summarize
-   + erp.approve_invoice
+   + erp.approve_inoice
    + email.send
    + workflow.create_approval_packet
    + reports.create_redacted_report
@@ -95,48 +95,48 @@ The Streamlit dashboard provides:
  - CISO compliance export pack
 
 🧩 Architecture
-                        ┌──────────────────────┐
-                        │ User Request         │
-                        │ Enterprise Document  │
-                        └──────────┬───────────┘
-                                   │
-                                   ▼
-                        ┌──────────────────────┐
-                        │ Gemini / MockPlanner │
-                        │ Produces ActionScript│
-                        └──────────┬───────────┘
-                                   │
-                                   ▼
-                        ┌──────────────────────┐
-                        │ Lobster Trap Finding │
-                        │ Risk + DPI metadata  │
-                        └──────────┬───────────┘
-                                   │
-                                   ▼
-                        ┌──────────────────────┐
-                        │ AxiomLNN Verifier    │
-                        │ Truth-bound policies │
-                        └──────────┬───────────┘
-                                   │
-                                   ▼
-                        ┌──────────────────────┐
-                        │ Deterministic Gate   │
-                        │ Final decision       │
-                        └──────────┬───────────┘
-                                   │
-                                   ▼
-                        ┌──────────────────────┐
-                        │ Decision Receipt     │
-                        │ Tamper-evident audit │
-                        └──────────┬───────────┘
-                                   │
-                                   ▼
-                        ┌──────────────────────┐
-                        │ Receipt Executor     │
-                        │ Tool runs only if    │
-                        │ receipt is valid     │
-                        │ and decision is ALLOW│
-                        └──────────────────────┘
+┌──────────────────────┐
+│ User Request         │
+│ Enterprise Document  │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Gemini / MockPlanner │
+│ Produces ActionScript│
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Lobster Trap Finding │
+│ Risk + DPI metadata  │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ AxiomLNN Verifier    │
+│ Truth-bound policies │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Deterministic Gate   │
+│ Final decision       │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Decision Receipt     │
+│ Tamper-evident audit │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Receipt Executor     │
+│ Tool runs only if    │
+│ receipt is valid     │
+│ and decision is ALLOW│
+└──────────────────────┘
 
 📁 Repository Structure
 AxiomGuard/

@@ -1,0 +1,86 @@
+name: axiomguard_finance_procurement_policy
+version: 1.0
+description: >
+  AxiomGuard MVP policy pack for procurement, finance, data privacy,
+  prompt injection, exfiltration, safe replanning, and human review.
+
+decision_priority:
+  - QUARANTINE
+  - DENY
+  - HUMAN_REVIEW
+  - REDACT
+  - RATE_LIMIT
+  - ALLOW
+
+rules:
+  - id: SEC-003
+    name: Quarantine prompt injection or exfiltration
+    decision: QUARANTINE
+    formula: "PromptInjection(x) OR ExfiltrationDetected(x) -> Quarantine(x)"
+    explanation: "Prompt injection or exfiltration attempt requires quarantine."
+
+  - id: SEC-004
+    name: Quarantine extremely high Lobster Trap risk
+    decision: QUARANTINE
+    formula: "LobsterTrapRiskAtLeast90(x) -> Quarantine(x)"
+    explanation: "Very high conversation-layer risk requires quarantine."
+
+  - id: DATA-002
+    name: Deny external transfer of sensitive data
+    decision: DENY
+    formula: "SendEmail(x) AND ContainsSensitiveData(x) AND ExternalDestination(x) -> Deny(x)"
+    explanation: "Sensitive data cannot be sent to external domains."
+
+  - id: DATA-003
+    name: Deny credential exposure
+    decision: DENY
+    formula: "CredentialDetected(x) -> Deny(x)"
+    explanation: "Credential-like content must not be transmitted or acted on."
+
+  - id: SEC-005
+    name: Deny risky command execution
+    decision: DENY
+    formula: "RiskyCommandDetected(x) -> Deny(x)"
+    explanation: "Risky operational commands are denied."
+
+  - id: FIN-001
+    name: High-value invoice approval requires human review
+    decision: HUMAN_REVIEW
+    formula: "ApproveInvoice(x) AND AmountAboveActorLimit(x) -> HumanReview(x)"
+    explanation: "Invoice amount exceeds actor approval authority."
+
+  - id: INTENT-001
+    name: Declared intent mismatch requires human review
+    decision: HUMAN_REVIEW
+    formula: "DeclaredIntentSafe(x) AND DetectedIntentHighRisk(x) -> HumanReview(x)"
+    explanation: "Declared intent and detected intent do not align."
+
+  - id: RISK-001
+    name: Elevated Lobster Trap risk requires human review
+    decision: HUMAN_REVIEW
+    formula: "LobsterTrapRiskAtLeast75(x) -> HumanReview(x)"
+    explanation: "Elevated security risk requires human review."
+
+  - id: PROC-004
+    name: Safe internal procurement summary
+    decision: ALLOW
+    formula: "SummarizeDocument(x) AND InternalDestination(x) AND NOT ContainsSecrets(x) -> Allow(x)"
+    explanation: "Read-only internal document summaries are allowed."
+
+  - id: WORKFLOW-001
+    name: Safe approval packet creation
+    decision: ALLOW
+    formula: "CreateApprovalPacket(x) AND ManagerQueueDestination(x) -> Allow(x)"
+    explanation: "Creating an approval packet for a manager queue is allowed."
+
+  - id: REPORT-001
+    name: Safe redacted report creation
+    decision: ALLOW
+    formula: "CreateRedactedReport(x) AND InternalHRDashboard(x) -> Allow(x)"
+    explanation: "Creating a redacted internal HR report is allowed."
+
+  - id: COMM-001
+    name: Safe non-sensitive external email
+    decision: ALLOW
+    formula: "SendEmail(x) AND NOT ContainsSensitiveData(x) AND NOT CredentialDetected(x) AND LowRisk(x) -> Allow(x)"
+    explanation: "A non-sensitive low-risk external email may be allowed."

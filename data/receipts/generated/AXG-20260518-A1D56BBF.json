@@ -1,0 +1,171 @@
+{
+  "receipt_id": "AXG-20260518-A1D56BBF",
+  "timestamp": "2026-05-18T22:36:16.052146Z",
+  "agent": "streamlit_procurement_copilot",
+  "action": {
+    "action_id": "ag_plan_001",
+    "actor": {
+      "id": "user_demo_001",
+      "role": "procurement_analyst",
+      "department": "demo",
+      "approval_limit_usd": 0.0
+    },
+    "declared_intent": "Summarize invoice_101 for internal review.",
+    "detected_intent": "unknown",
+    "action_type": "summarize_invoice",
+    "tool_name": "docs.summarize",
+    "resource_id": "invoice_101",
+    "amount_usd": 1400.0,
+    "destination": "internal_ui",
+    "recipient": null,
+    "data_classes": [
+      "vendor_name"
+    ],
+    "risk_signals": [],
+    "justification": "User requested summarization of invoice_101 for internal review.",
+    "evidence": [
+      {
+        "source": "User request",
+        "field": "declared_intent",
+        "excerpt": "Summarize invoice_101 for internal review."
+      },
+      {
+        "source": "User request",
+        "field": "action_type",
+        "excerpt": "Summarize invoice_101"
+      },
+      {
+        "source": "Available simulated enterprise tools",
+        "field": "tool_name",
+        "excerpt": "docs.summarize\n   Use for summarize_invoice"
+      },
+      {
+        "source": "User request",
+        "field": "resource_id",
+        "excerpt": "invoice_101"
+      },
+      {
+        "source": "Enterprise document context",
+        "field": "resource_id",
+        "excerpt": "Invoice invoice_101."
+      },
+      {
+        "source": "Enterprise document context",
+        "field": "amount_usd",
+        "excerpt": "Amount: 1400 USD."
+      },
+      {
+        "source": "Enterprise document context",
+        "field": "data_classes",
+        "excerpt": "Vendor: SafeOffice Supplies."
+      }
+    ]
+  },
+  "lobstertrap_findings": {
+    "prompt_injection": false,
+    "exfiltration_detected": false,
+    "pii_detected": false,
+    "credential_detected": false,
+    "risky_command_detected": false,
+    "intent_mismatch": false,
+    "detected_domains": [],
+    "target_paths": [],
+    "declared_intent_category": "summary",
+    "detected_intent_category": "workflow",
+    "risk_score": 8.0,
+    "raw": {
+      "source": "streamlit_heuristic_lobstertrap"
+    }
+  },
+  "lnn_inference": {
+    "allow": {
+      "lower": 0.92,
+      "upper": 0.9500000000000001
+    },
+    "deny": {
+      "lower": 0.0,
+      "upper": 0.05
+    },
+    "redact": {
+      "lower": 0.0,
+      "upper": 0.05
+    },
+    "quarantine": {
+      "lower": 0.0,
+      "upper": 0.05
+    },
+    "human_review": {
+      "lower": 0.0,
+      "upper": 0.05
+    },
+    "rate_limit": {
+      "lower": 0.0,
+      "upper": 0.05
+    },
+    "contradiction_loss": 0.0,
+    "matched_formulas": [
+      {
+        "policy_id": "PROC-004",
+        "decision": "ALLOW",
+        "formula": "SummarizeDocument(x) AND InternalDestination(x) AND NOT ContainsSecrets(x) -> Allow(x)",
+        "score": 0.92,
+        "trace": "Safe read-only internal document summary is allowed."
+      }
+    ],
+    "facts": {
+      "ActionId": "ag_plan_001",
+      "ActorId": "user_demo_001",
+      "ActorRole": "procurement_analyst",
+      "ActionType": "summarize_invoice",
+      "ToolName": "docs.summarize",
+      "Destination": "internal_ui",
+      "SummarizeInvoice": true,
+      "SummarizeContract": false,
+      "SummarizeDocument": true,
+      "ApproveInvoice": false,
+      "SendEmail": false,
+      "CreateApprovalPacket": false,
+      "CreateRedactedReport": false,
+      "UsesDocsSummarizeTool": true,
+      "UsesERPApprovalTool": false,
+      "UsesEmailTool": false,
+      "UsesApprovalPacketTool": false,
+      "UsesRedactedReportTool": false,
+      "InternalDestination": true,
+      "ExternalDestination": false,
+      "ManagerQueueDestination": false,
+      "InternalHRDashboard": false,
+      "ContainsSensitiveData": false,
+      "ContainsSecrets": false,
+      "ContainsPII": false,
+      "ContainsCredential": false,
+      "AmountUSD": 1400.0,
+      "ActorApprovalLimitUSD": 0.0,
+      "AmountAboveActorLimit": false,
+      "PromptInjection": false,
+      "ExfiltrationDetected": false,
+      "CredentialDetected": false,
+      "RiskyCommandDetected": false,
+      "IntentMismatch": false,
+      "LobsterTrapRiskScore": 8.0,
+      "LobsterTrapRiskAtLeast90": false,
+      "LobsterTrapRiskAtLeast75": false,
+      "LowRisk": true,
+      "DeclaredIntentCategory": "summary",
+      "DetectedIntentCategory": "workflow",
+      "DeclaredIntentSafe": true,
+      "DetectedIntentHighRisk": false
+    },
+    "trace": "AxiomLNN Verification Trace\n\nAction:\n- action_id: ag_plan_001\n- action_type: summarize_invoice\n- tool_name: docs.summarize\n- actor_role: procurement_analyst\n- destination: internal_ui\n- amount_usd: 1400.0\n\nLobster Trap:\n- risk_score: 8.0\n- prompt_injection: False\n- exfiltration_detected: False\n- pii_detected: False\n- credential_detected: False\n- intent_mismatch: False\n\nActive Facts:\n- SummarizeInvoice\n- SummarizeDocument\n- UsesDocsSummarizeTool\n- InternalDestination\n- LowRisk\n- DeclaredIntentSafe\n\nMatched Policy Formulas:\n- PROC-004: SummarizeDocument(x) AND InternalDestination(x) AND NOT ContainsSecrets(x) -> Allow(x) => ALLOW (0.92)\n\nDecision Node Scores:\n- Allow: 0.92\n- Deny: 0.00\n- Redact: 0.00\n- Quarantine: 0.00\n- HumanReview: 0.00\n- RateLimit: 0.00\n\nContradiction Loss:\n- 0.00\n"
+  },
+  "enforcement": {
+    "decision": "ALLOW",
+    "reason": "Safe read-only internal document summary is allowed.",
+    "matched_policy": "PROC-004",
+    "safe_alternative": null,
+    "execution_status": "not_executed"
+  },
+  "receipt_hash": "sha256:ac74d62340d2ec38bbdf6ca6ad528fc6681aaab6aee0c7ab32775173268ae1e3",
+  "previous_receipt_hash": null,
+  "version": "1.0"
+}

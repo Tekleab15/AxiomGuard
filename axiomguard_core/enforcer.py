@@ -72,7 +72,6 @@ EXPECTED_TOOL_BY_ACTION: dict[ActionType, set[ToolName]] = {
 class DeterministicGate:
     """
     AxiomGuard's final pre-execution policy gate.
-
     It has two stages:
     1. Hard boundary checks:
        These are non-negotiable enterprise controls. They override all LNN scores.
